@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
 
 # Define a single set of headers
 headers = {
@@ -18,12 +19,21 @@ response = requests.get(url, headers=headers)
 # Parse the HTML content using BeautifulSoup
 soup = BeautifulSoup(response.text, 'lxml')
 
-# Extract the title of the page
-
-
 # Extract and print book titles and prices
 books = soup.find_all('article', class_='product_pod')
+
+# Prepare a list to store the extracted data
+data = []
+
 for book in books:
     book_title = book.h3.a['title']
     book_price = book.find('p', class_='price_color').text
-    print(f"Title: {book_title}, Price: {book_price}")
+    data.append({"Title": book_title, "Price": book_price})
+
+# Create a DataFrame from the extracted data
+df = pd.DataFrame(data)
+
+# Write the DataFrame to an Excel file
+df.to_excel("books.xlsx", index=False)
+
+print("Data has been written to books.xlsx")
